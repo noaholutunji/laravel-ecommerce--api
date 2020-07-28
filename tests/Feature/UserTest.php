@@ -62,10 +62,21 @@ class UserTest extends TestCase
             'password' => bcrypt('olutunji91'),
         ]);
 
+        $response = $this->json('POST', 'api/login', [
+            'email' => 'osuolale49@gmail.com',
+            'password' => 'fakePassword',
+        ]);
+
+        $response->assertStatus(401);
+
         $payload = ['email' => 'osuolale49@gmail.com', 'password' => 'olutunji91'];
 
         $this->json('POST', 'api/login', $payload)
             ->assertStatus(200);
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'osuolale49@gmail.com',
+        ]);
     }
 
     /** @test */

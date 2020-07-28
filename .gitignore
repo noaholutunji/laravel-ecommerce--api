@@ -3,6 +3,7 @@
 /public/storage
 /storage/*.key
 /vendor
+/coverage_reports
 .env
 .env.backup
 .phpunit.result.cache

@@ -101,11 +101,10 @@ class CreateProductsTest extends TestCase
      }
 
     /** @test */
-    public function a_user_and_guest_view_a_single_product()
+    public function a_user_and_guest_can_view_a_single_product()
     {
         $product = create('App\Product');
-
-        $response = $this->json('GET', '/api/products', [])
+        $this->get($product->path())
         ->assertStatus(200)
         ->assertSee($product->name);
     }
@@ -163,31 +162,29 @@ class CreateProductsTest extends TestCase
             ->assertStatus(403);
     }
 
+     /** @test */
+     function authorized_user_can_delete_product()
+     {
+         $user = create('App\User');
 
-    /** @test */
-    function authorized_user_can_delete_product()
-    {
-        $this->withExceptionHandling();
+         $token = $user->createAccessToken();
+         $header = ['Authorization' => "Bearer $token"];
 
-        $user = create('App\User');
+         $product = create('App\Product', ['user_id' => $user->id]);
 
-        $token = $user->createAccessToken();
-        $header = ['Authorization' => "Bearer $token"];
+         $this->delete($product->path(), [], $header);
 
-        $product = make('App\Product', ['user_id' => $user->id]);
+         $this->assertDatabaseMissing('products', ['id' => $product->id]);
+     }
 
-        $this->delete($product->path(), [], $header);
-
-        $this->assertDatabaseMissing('products', ['id' => $product->id]);
-    }
 
 
     protected function publishProduct($overrides = [])
     {
-        $header =  $this->withExceptionHandling()->signIn();
+        $user =  $this->withExceptionHandling()->signIn();
 
         $products = make('App\Product', $overrides);
 
-        return $this->post('/api/products', $products->toArray(), $header);
+        return $this->post('/api/products', $products->toArray(), $user);
     }
 }

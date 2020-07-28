@@ -11,6 +11,7 @@ class Kernel extends ConsoleKernel
      * The Artisan commands provided by your application.
      *
      * @var array
+     * @codeCoverageIgnore
      */
     protected $commands = [
         //
@@ -21,6 +22,7 @@ class Kernel extends ConsoleKernel
      *
      * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
      * @return void
+     * @codeCoverageIgnore
      */
     protected function schedule(Schedule $schedule)
     {
