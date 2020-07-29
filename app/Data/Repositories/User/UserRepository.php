@@ -5,6 +5,6 @@ use Illuminate\Http\Request;
 
 interface UserRepository
 {
-    public function register($attributes);
+    public function register($user);
 
 }

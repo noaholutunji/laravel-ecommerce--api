@@ -9,20 +9,21 @@ abstract class TestCase extends BaseTestCase
     use CreatesApplication;
 
     protected function setUp() : void
-{
-    parent::setUp();
+    {
+        parent::setUp();
 
-    $this->withoutExceptionHandling();
+        $this->withoutExceptionHandling();
 
-    \Artisan::call('passport:install');
+        \Artisan::call('passport:install');
 
-}
+    }
 
     protected function signIn()
     {
         $user = create('App\User');
 
         $token = $user->createAccessToken();
+
         $header = ['Authorization' => "Bearer $token"];
 
         return $header;
