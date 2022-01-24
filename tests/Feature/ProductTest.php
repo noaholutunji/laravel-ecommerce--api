@@ -4,8 +4,7 @@ namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use App\Product;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+
 
 class CreateProductsTest extends TestCase
 {
@@ -36,77 +35,77 @@ class CreateProductsTest extends TestCase
         ];
 
         $this->post('/api/products', $attributes, $user)
-                ->assertStatus(201);
+            ->assertStatus(201);
 
         $this->assertDatabaseHas('products', $attributes);
     }
 
     /** @test */
-    function test_a_product_requires_a_name()
+    function a_product_requires_a_name()
     {
-        $this->publishProduct(['name' => ''])
+        $this->createProduct(['name' => ''])
             ->assertSessionHasErrors('name');
     }
 
     /** @test */
-    function test_a_product_requires_a_brand()
+    function a_product_requires_a_brand()
     {
-        $this->publishProduct(['brand' => ''])
+        $this->createProduct(['brand' => ''])
             ->assertSessionHasErrors('brand');
     }
 
     /** @test */
-    function test_a_product_requires_a_image()
+    function a_product_requires_a_image()
     {
-        $this->publishProduct(['image' => ''])
+        $this->createProduct(['image' => ''])
             ->assertSessionHasErrors('image');
     }
 
     /** @test */
-    function test_a_product_requires_a_price()
+    function a_product_requires_a_price()
     {
-        $this->publishProduct(['price' => ''])
+        $this->createProduct(['price' => ''])
             ->assertSessionHasErrors('price');
     }
 
     /** @test */
-    function test_a_product_requires_a_description()
+    function a_product_requires_a_description()
     {
-        $this->publishProduct(['description' => ''])
+        $this->createProduct(['description' => ''])
             ->assertSessionHasErrors('description');
     }
 
-     /** @test */
-     function a_user_and_guest_can_view_all_products()
-     {
-         $product1 = factory('App\Product')->create([
-             'name' => 'Sony vio',
-             'brand' => 'Sony',
-             'image' => 'http//unsplash.com/helloworld',
-             'price' => '2000',
-             'description' => 'A phone you will love'
-         ]);
+    /** @test */
+    function a_user_and_guest_can_view_all_products()
+    {
+        $product1 = factory('App\Product')->create([
+            'name' => 'Sony vio',
+            'brand' => 'Sony',
+            'image' => 'http//unsplash.com/helloworld',
+            'price' => '2000',
+            'description' => 'A phone you will love'
+        ]);
 
-         $product2 = factory('App\Product')->create([
-             'name' => 'Sony vio',
-             'brand' => 'Sony',
-             'image' => 'http//unsplash.com/helloworld',
-             'price' => '2000',
-             'description' => 'A phone you will love'
-         ]);
+        $product2 = factory('App\Product')->create([
+            'name' => 'Sony vio',
+            'brand' => 'Sony',
+            'image' => 'http//unsplash.com/helloworld',
+            'price' => '2000',
+            'description' => 'A phone you will love'
+        ]);
 
-         $response = $this->json('GET', '/api/products', [])
-             ->assertStatus(200)
-             ->assertSee($product1->name, $product2->name);
-     }
+        $response = $this->json('GET', '/api/products', [])
+            ->assertStatus(200)
+            ->assertSee($product1->name, $product2->name);
+    }
 
     /** @test */
     public function a_user_and_guest_can_view_a_single_product()
     {
         $product = create('App\Product');
         $this->get($product->path())
-        ->assertStatus(200)
-        ->assertSee($product->name);
+            ->assertStatus(200)
+            ->assertSee($product->name);
     }
 
     /** @test */
@@ -116,7 +115,8 @@ class CreateProductsTest extends TestCase
 
         $header = $this->signIn();
 
-        $product = create('App\Product',
+        $product = create(
+            'App\Product',
             ['user_id' => create('App\User')->id]
         );
 
@@ -133,7 +133,8 @@ class CreateProductsTest extends TestCase
         $token = $user->createAccessToken($user);
         $headers = ['Authorization' => "Bearer $token"];
 
-        $product = create('App\Product',
+        $product = create(
+            'App\Product',
             ['user_id' => $user->id]
         );
 
@@ -162,24 +163,23 @@ class CreateProductsTest extends TestCase
             ->assertStatus(403);
     }
 
-     /** @test */
-     function authorized_user_can_delete_product()
-     {
-         $user = create('App\User');
+    /** @test */
+    function authorized_user_can_delete_product()
+    {
+        $user = create('App\User');
 
-         $token = $user->createAccessToken();
-         $header = ['Authorization' => "Bearer $token"];
+        $token = $user->createAccessToken();
+        $header = ['Authorization' => "Bearer $token"];
 
-         $product = create('App\Product', ['user_id' => $user->id]);
+        $product = create('App\Product', ['user_id' => $user->id]);
 
-         $this->delete($product->path(), [], $header);
+        $this->delete($product->path(), [], $header);
 
-         $this->assertDatabaseMissing('products', ['id' => $product->id]);
-     }
+        $this->assertDatabaseMissing('products', ['id' => $product->id]);
+    }
 
 
-
-    protected function publishProduct($overrides = [])
+    protected function createProduct($overrides = [])
     {
         $user =  $this->withExceptionHandling()->signIn();
 
